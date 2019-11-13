@@ -27,7 +27,7 @@ output "ws_sub_mapping" {
 output "workspace_rg_location_mapping" {
     value = {
         default = ""
-        dev    = "australiasoutheast"
-        prd    = "australiaeast"
+        dev     = "australiasoutheast"
+        prd     = "australiaeast"
   }
 }
