@@ -21,7 +21,7 @@ module "environment" {
 provider "azurerm" {
   tenant_id       = "${module.global.tenant_id}"
   subscription_id = "${module.environment.subscription}"
-  version         = "~> 1.36.0"
+  version         = "~> 1.0"
 }
 
 resource "azurerm_resource_group" "workspace-rg" {
@@ -51,26 +51,12 @@ resource "azurerm_subnet" "subs" {
   name                      = "sub-${count.index}"
   resource_group_name       = "${azurerm_resource_group.workspace-rg.name}"
   virtual_network_name      = "${azurerm_virtual_network.vnet.name}"
-  address_prefix             = "${cidrsubnet(element(azurerm_virtual_network.vnet.address_space,0), 1, count.index)}"
+  address_prefix            = "${cidrsubnet(element(azurerm_virtual_network.vnet.address_space,0), 1, count.index)}"
   network_security_group_id = "${azurerm_network_security_group.nsg.id}"
   service_endpoints = [
     "Microsoft.Sql",
     "Microsoft.Storage",
   ]
-
-  delegation {
-    name = "delegation-${count.index}"
-    service_delegation {
-      name = "Microsoft.Databricks/workspaces"
-      actions = [
-        "Microsoft.Network/virtualNetworks/subnets/join/action",
-        "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
-        "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action",
-        "Microsoft.Network/networkinterfaces/*",
-        "Microsoft.Network/virtualNetworks/subnets/action",
-      ]
-    }
-  }
 }
 
 resource "azurerm_subnet_network_security_group_association" "nsg_assoc" {
