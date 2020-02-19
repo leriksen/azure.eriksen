@@ -51,7 +51,7 @@ resource "azurerm_subnet" "subs" {
   name                      = "sub-${count.index}"
   resource_group_name       = azurerm_resource_group.workspace-rg.name
   virtual_network_name      = azurerm_virtual_network.vnet.name
-  address_prefix            = cidrsubnet(element(azurerm_virtual_network.vnet.address_space,0), 1, count.index)
+  address_prefix             = cidrsubnet(element(azurerm_virtual_network.vnet.address_space,0), 1, count.index)
   network_security_group_id = azurerm_network_security_group.nsg.id
   service_endpoints = [
     "Microsoft.Sql",
@@ -65,10 +65,42 @@ resource "azurerm_subnet_network_security_group_association" "nsg_assoc" {
   subnet_id                 = element(azurerm_subnet.subs.*.id, count.index)
 }
 
-resource "azurerm_storage_account" "sa00" {
-  name = "sa"
+resource "azurerm_storage_account" "sa" {
+  name = "${random_string.saname.result}sa00"
   location = module.environment.location
   resource_group_name = azurerm_resource_group.workspace-rg.name
   account_replication_type = "LRS"
   account_tier = "Standard"
+  network_rules {
+    default_action = "Deny"
+    ip_rules = concat(
+      local.whitelisted_ip_addresses,
+        azurerm_subnet.subs.*.address_prefix
+    )
+  }
+}
+
+provider "random" {
+  version = "~> 2.0"
+}
+
+resource "random_string" "saname" {
+  length  = 5
+  upper   = false
+  special = false
+}
+
+locals {
+  whitelisted_ip_addresses = [
+    # see https://ips.zscaler.net/cenr for names
+    "103.66.52.0/29",   # Microsoft Peering - Melbourne Equinix Cloud Exchange
+    "103.66.53.0/29",   # Microsoft Peering - Sydney Equinix Cloud Exchange
+    "146.178.91.0/24",  # PSDC AGL Data Centre
+    "146.178.95.0/24",  # ESDC AGL Data Centre
+    "165.225.98.0/24",  # Zscalar Melbourne
+    "165.225.114.0/23", # Zscalar Sydney 3
+    "165.225.226.0/23", # Zscalar Melbourne 2
+    "175.45.116.0/24",  # Zscalar Sydney
+    "165.225.106.0/23", # Zscalar Mumbai 2
+  ]
 }
