@@ -25,8 +25,8 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "workspace-rg" {
-  location = "module.environment.location
-  name     = "${module.global.prefix}-${var.TERRAFORM_WORKSPACE}
+  location = module.environment.location
+  name     = "${module.global.prefix}-${var.TERRAFORM_WORKSPACE}"
   tags     = module.global.tags
 }
 
@@ -63,4 +63,12 @@ resource "azurerm_subnet_network_security_group_association" "nsg_assoc" {
   count = 2
   network_security_group_id = azurerm_network_security_group.nsg.id
   subnet_id                 = element(azurerm_subnet.subs.*.id, count.index)
+}
+
+resource "azurerm_storage_account" "sa" {
+  name = "sa"
+  location = module.environment.location
+  resource_group_name = azurerm_resource_group.workspace-rg.name
+  account_replication_type = "LRS"
+  account_tier = "Standard"
 }
