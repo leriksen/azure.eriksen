@@ -65,7 +65,7 @@ resource "azurerm_subnet_network_security_group_association" "nsg_assoc" {
   subnet_id                 = element(azurerm_subnet.subs.*.id, count.index)
 }
 
-resource "azurerm_storage_account" "sa" {
+resource "azurerm_storage_account" "sa00" {
   name = "sa"
   location = module.environment.location
   resource_group_name = azurerm_resource_group.workspace-rg.name
