@@ -75,7 +75,10 @@ resource "azurerm_storage_account" "sa" {
     default_action = "Deny"
     ip_rules = concat(
       local.whitelisted_ip_addresses,
-        azurerm_subnet.subs.*.address_prefix
+      list(
+        azurerm_subnet.subs.0.address_prefix,
+        azurerm_subnet.subs.1.address_prefix
+      )
     )
   }
 }
