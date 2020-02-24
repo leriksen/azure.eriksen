@@ -4,6 +4,7 @@ pr: none
 jobs:
 - job: post_arc_jar
   displayName: post arc jar
-  pool: ubuntu-latest
+  pool:
+    name: ubuntu-latest
   steps:
   - checkout: self
