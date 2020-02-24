@@ -65,23 +65,23 @@ resource "azurerm_subnet_network_security_group_association" "nsg_assoc" {
   subnet_id                 = element(azurerm_subnet.subs.*.id, count.index)
 }
 
-resource "azurerm_storage_account" "sa" {
-  name = "${random_string.saname.result}sa00"
-  location = module.environment.location
-  resource_group_name = azurerm_resource_group.workspace-rg.name
-  account_replication_type = "LRS"
-  account_tier = "Standard"
-  network_rules {
-    default_action = "Deny"
-    ip_rules = concat(
-      local.whitelisted_ip_addresses,
-      list(
-        azurerm_subnet.subs.0.address_prefix,
-        azurerm_subnet.subs.1.address_prefix
-      )
-    )
-  }
-}
+//resource "azurerm_storage_account" "sa" {
+//  name = "${random_string.saname.result}sa00"
+//  location = module.environment.location
+//  resource_group_name = azurerm_resource_group.workspace-rg.name
+//  account_replication_type = "LRS"
+//  account_tier = "Standard"
+//  network_rules {
+//    default_action = "Deny"
+//    ip_rules = concat(
+//      local.whitelisted_ip_addresses,
+//      list(
+//        azurerm_subnet.subs.0.address_prefix,
+//        azurerm_subnet.subs.1.address_prefix
+//      )
+//    )
+//  }
+//}
 
 provider "random" {
   version = "~> 2.0"
